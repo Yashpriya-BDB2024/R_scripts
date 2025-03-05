@@ -47,7 +47,7 @@ find_largest <- function(sentence) {
 print(find_largest("She sells hundreds of sea oysters on the sea shore."))
 
 # Q-6: Load the data in ‘worldfloras.txt’ and do the following:-
-data <- read.table("C:\\Users\\Yash Priya Baid\\SEM-2\\BS_and_R\\worldfloras.txt", header=TRUE, sep="\t")
+data <- read.table("/home/ibab/Downloads/worldfloras.txt", header=TRUE, sep="\t") 
 
 # Q-6.1: Create subsets of countries within the same continent and store the data as different dataframes.
 print(unique(data$Continent))     # Will display all the continent names
@@ -115,3 +115,58 @@ print(population_skewness)
 print(population_kurtosis)
 # Interpretation: Population data are highly right-skewed in some continents, suggesting a few countries dominate in population size.
 # There may be a relation with floral count patterns, but formal correlation is needed.
+
+# Q-7 (Read in the data from ‘HumanBones.txt’ and group the data into categories “Chest”,“Spine”,“Skull”, “Ear Bones”, “Arms” and “Legs”.)
+lines <- readLines("/home/ibab/Downloads/HumanBones.txt")
+results <- list()     # List to store bone records
+current_cat <- NA     # Current category holder
+for (line in lines) {
+  line <- trimws(line)    # Remove extra spaces
+  if(line == "") next     # Skip empty lines
+  if (!grepl("\\(", line)) {    # If line doesn't contain '(', it's a category name
+    current_cat <- line
+  } else {    # Otherwise, it's a bone entry
+    parts <- unlist(strsplit(line, "\\("))
+    bone_name <- trimws(parts[1])
+    count_text <- gsub("\\).*", "", parts[2])   # Remove closing parenthesis and extra text
+    count <- as.numeric(unlist(strsplit(count_text, " "))[1])    # Take the first number
+    results[[length(results) + 1]] <- data.frame(Category = current_cat,
+                                                 Bone = bone_name,
+                                                 Count = count,
+                                                 stringsAsFactors = FALSE)
+  }
+}
+# Combine all individual bone records into one dataframe
+human_bones <- do.call(rbind, results)
+print(human_bones)
+
+# Q-8: Create a frequency table for total bones per category and plot a bar plot
+bone_freq <- aggregate(Count ~ Category, data = human_bones, FUN = function(x) sum(x))
+print(bone_freq)
+max_category <- bone_freq[which.max(bone_freq$Count), ]
+cat("Category with maximum bones:\n")
+print(max_category)       # Arms & Legs has the maximum no. of bones, i.e., 60
+barplot(bone_freq$Count,
+        names.arg = bone_freq$Category,
+        main = "Total Number of Bones by Category",
+        xlab = "Category",
+        ylab = "Total Bones",
+        col = "skyblue",
+        las = 2)     # Vertical labels for clarity
+
+# Q-9: Subset "Legs" category and print bone names longer than 5 letters
+legs_subset <- subset(human_bones, Category == "Legs")
+print(legs_subset$Bone[nchar(legs_subset$Bone) > 5])
+
+# Q-10: List all bones starting with "M" and change lowercase "a" to uppercase "A"
+bones_M <- human_bones$Bone[grep("^M", human_bones$Bone)]
+print(gsub("a", "A", bones_M))
+
+# Q-11: List bones ending with "e" and convert them to lowercase
+bones_ending_with_e <- subset(human_bones, grepl("e$", Bone))
+bones_ending_with_e$Bone <- tolower(bones_ending_with_e$Bone)
+print(bones_ending_with_e$Bone)
+
+# Q-12: List bones with two "o"s in their names
+bones_with_two_o <- subset(human_bones, grepl("o.*o", Bone))
+print(bones_with_two_o$Bone)

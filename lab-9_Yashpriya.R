@@ -53,7 +53,6 @@ barplot(probabilities, names.arg = x_vals, col = "lightblue", border = "black",
 binomial_pmf_builtin <- function(n, p) {
   x_vals <- 0:n    
   probabilities <- dbinom(x_vals, size = n, prob = p)  
-  
   barplot(probabilities, names.arg = x_vals, col = "orange", border = "black",
           main = paste("Built-in Binomial Histogram\n(n =", n, ", p =", p, ")"),
           xlab = "Number of Successes", ylab = "Probability", ylim = c(0, max(probabilities) * 1.2))
@@ -150,8 +149,7 @@ legend("topright", legend=c("λ = 3", "λ = 20", "λ = 45"),
        col=c("blue", "red", "green"), lwd=2)
 
 # Q-9 (Load the csv file for heights and weights of 25000 people and do the following:)
-# data <- read.csv("/home/ibab/Downloads/SOCR-HeightWeight.csv")
-data <- read.csv("C:\\Users\\Yash Priya Baid\\SEM-2\\BS_and_R\\SOCR-HeightWeight.csv")
+data <- read.csv("/home/ibab/Downloads/SOCR-HeightWeight.csv")
 print(head(data))
 
 # Q-9.1 (Plot a histogram of the height variable and determine it’s mean and standard deviation.)

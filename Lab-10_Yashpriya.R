@@ -159,32 +159,25 @@ poisson_cpdf <- ppois(m, lambda)
 print(poisson_cpdf)   # Output: 0.2202206
 
 # Q-5.3 (Make two bar plots showing a binomial probability distribution with n=1000, p=0.3 and a Poisson PDF with λ=np. Do the two distributions agree? Why? Why not?)
-n <- 1000
-p <- 0.3
-lambda_val <- n*p
-x_vals <- 0:30   # Range of values for comparison
-binomial_pmf <- dbinom(x_vals, n, p)
-poisson_pmf <- dpois(x_vals, lambda_val)
-par(mfrow=c(1,2))
-barplot(binomial_pmf, names.arg=x_vals, col="yellow", main="Binomial (n=1000, p=0.3) vs Poisson (λ=np)", xlab="m-values", ylab="Probability", border="black")
-barplot(poisson_pmf, names.arg=x_vals, col="lightgreen", add=TRUE, border="black")    # add=TRUE overlays the 2nd plot over 1st plot
-legend("topright", legend=c("Binomial Distri.", "Poisson Distri."), fill=c("yellow", "lightgreen"))
+# The two distributions don't agree when p is 0.3, because the poisson distribution is an approximation of the binomial only when p is small (typically p < 0.1) and n is large.
+n = 1000
+p = 0.01
+lambda = n * p
+m_values = 0:150
+binom_values <- dbinom(m_values, size = n, prob = p)
+pois_values <- dpois(m_values, lambda)
+plot(m_values, binom_values,xlim=c(0,150),ylim=c(0,0.5), type = "h", col = "hotpink2", lwd = 2, main = "Binomial vs Poisson Distribution", xlab = "m values", ylab = "Probability")
+# Overlay Poisson Distribution
+lines(m_values, pois_values,xlim=c(0,150),ylim=c(0,0.5), type = "l", col = "steelblue2", pch=16,lwd = 2)
+legend("topright", legend = c("Binomial", "Poisson"), col = c("hotpink2", "steelblue2"), lwd = 2)
 
-# Q-6 (Gaussian Distribution)
+# Q-5.4 (Find the quantile value corresponding to cumulative probability of 0.22 and λ = 10.)
+lambda=10
+m_val <- qpois(0.22,lambda)
+print(m_val)    # Output: 7
 
-# Q-6.1 (Compute and print the unit normal PDF value for μ = 12 and σ = 2)
-mu <- 12
-sigma <- 2
-x <- 12   # The point at which we evaluate the PDF
-gaussian_pdf <- dnorm(x, mu, sd=sigma)
-print(gaussian_pdf)
-
-# Q-6.2 (Calculate and print the cumulative probability for Z = 2.0. Is this same as 1-CPDF(Z=-2)?)
-Z <- 2.0
-cpdf_val <- pnorm(Z)   
-print(cdf_val)   # Output: 0.9772499
-Z1 <- -2
-cpdf_val1 <- 1-pnorm(Z1)
-print(cpdf_val1)   # Output: 0.9772499 (same as above)
-
-# Q-6.3 (Plot a unit normal curve for the above parameters with X range of ±4σ and add a text box to the plot showing the parameter symbols and their values.)
+# Q-5.5 (Obtain 10000 random sample points from a Poisson distribution with λ = 9 and make a histogram plot.)
+sample_size <- 10000
+lambda1 <- 9
+random_poisson <- rpois(sample_size, lambda1)
+hist(random_poisson, brea-ks = seq(min(random_poisson), max(random_poisson), by = 1), border = "black", main = "Histogram of Poisson Distribution (lambda=9)", xlab = "No of events (m)", ylab="Frequency")

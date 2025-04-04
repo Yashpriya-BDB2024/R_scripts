@@ -4,19 +4,82 @@
 mu <- 12
 sigma <- 2
 x <- 12   # The point at which we evaluate the PDF
-gaussian_pdf <- dnorm(x, mu, sd=sigma)
-print(gaussian_pdf)
+gaussian_pdf <- dnorm(x, mean=mu, sd=sigma)
+print(gaussian_pdf)   # Output: 0.1994711
 
 # Q-6.2 (Calculate and print the cumulative probability for Z = 2.0. Is this same as 1-CPDF(Z=-2)?)
 Z <- 2.0
 cpdf_val <- pnorm(Z)   
-print(cdf_val)   # Output: 0.9772499
+print(cpdf_val)   # Output: 0.9772499
 Z1 <- -2
 cpdf_val1 <- 1-pnorm(Z1)
 print(cpdf_val1)   # Output: 0.9772499 (same as above)
 
 # Q-6.3 (Plot a unit normal curve for the above parameters with X range of ±4σ and add a text box to the plot showing the parameter symbols and their values.)
+x <- seq(mu - 4*sigma, mu + 4*sigma, length.out=500)
+y <- dnorm(x, mean=mu, sd=sigma)
+plot(x, y, type="l", lwd=2, col="blue", main="Normal Distribution (mean=12, sigma=2)", xlab="x values", ylab="Density")
+text(x=mu+2, y=max(y)*0.8, labels=paste("mu =", mu, "\nsigma =", sigma), pos=4, cex=0.8, col="darkred")   # pos=4 : right to the (x,y) point
 
+# Q-6.4 (Generate the 75th quantile point for a unit normal distribution with the above parameters.)
+quantile_75 <- qnorm(0.75, mean=mu, sd=sigma)
+print(quantile_75)  # Output: 13.34898
+
+# Q-6.5 (Generate 10,000 random deviates from the unit normal distribution and plot a histogram. On top of this plot the unit normal curve from which you sampled.)
+normal_random_deviates <- rnorm(10000, mean=mu, sd=sigma)
+hist(normal_random_deviates, breaks=30, col="skyblue", probability=TRUE, main="Histogram with normal curve", xlab="Values", ylab="Density")
+lines(x, y, col="red", lwd=2)   # On top of this, plot the unit normal density curve 
+
+# Q-6.6 (Make a histogram plot of a ‘normalized’ binomial distribution with μ = np = 10 and p = 0.5. 
+# ‘Normalized’ here means computing a variable of type W = m−np/sqrt(np(1−p)) where m is the number of successes in n trials. 
+# On top of this, plot a unit normal distribution N(np,np(1-p)). Do the two distributions agree?)
+n <- 100  # Sample size (n<100 - doesn't agree)
+p <- 0.5
+mu <- n*p
+sd_binom <- sqrt(n*p*(1-p))
+m <- rbinom(10000, size=n, prob=p)   # Generate 10,000 random binomial samples
+W <- (m - mu) / sd_binom   # W: normalized binomial
+hist(W, probability=TRUE, breaks=30, col="yellow", main="Normalized Binomial Distribution vs Normal Unit Distribution", xlab="W")
+curve(dnorm(x, mean=0, sd=1), col="darkgreen", lwd=2, add=T)   # add=T - overlays the normal curve onto the existing histogram instead of replacing it.
+# Acc. to CLT, as sample size increases, the sampling distribution of the binomial (even though it's discrete) becomes increasingly bell-shaped and approximates a normal distribution, especially when p≈0.5.
+
+# Q-6.7 (Plot 4 Poisson probability distribution functions corresponding to λ values 1, 10, 100 and 1000 in the same graph. 
+# On the same graph of each Poisson PDF plot, plot a unit normal distribution with Z = (m-λ)/sqrt(λ). 
+# For what value of λ(s) do the two plots agree? Use a 2x2 grid for this problem.)
+
+# Method-1 (Mean centered at 0) -
+par(mfrow = c(2,2))  # 2x2 Grid
+lambda_vals <- c(1,10,100,1000)
+for (lambda in lambda_vals) {
+  m <- 0:(lambda + 3 * sqrt(lambda))  
+  z_vals <- (m - lambda) / sqrt(lambda)
+  plot(z_vals, dnorm(z_vals), type="h", lwd=2, col="blue", main=paste("λ =", lambda), xlab="Z = (m - λ) / sqrt(λ)", ylab="Probability")   # Plot Poisson PMF (normalized)
+  z_norm <- seq(-4, 4, length.out =100)
+  lines(z_norm, dnorm(z_norm), col = "red", lwd = 2)   # Overlay Standard Normal Curve
+}
+par(mfrow=c(1,1))
+
+# Method-2 (Original mean restored after normalization)
+par(mfrow = c(2,2))  # 2x2 Grid
+lambda_vals <- c(1,10,100,1000)
+for (lambda in lambda_vals) {
+  x <- 0:(lambda + 3 * sqrt(lambda))  
+  pois_probs <- dpois(x, lambda)
+  plot(x, pois_probs, type ="h")
+  z_vals <- (x - lambda) / sqrt(lambda)
+  lines(x, dnorm(x, mean = lambda, sd = sqrt(lambda)))
+}
+par(mfrow=c(1,1))
+ 
+# Q-6.8 (The library MASS is used to generate two or more vectors of normally distributed random numbers that are correlated with one another to a specified degree.)
+install.packages('MASS')
+library('MASS')
+xy <- mvrnorm(1000, mu=c(50,60), matrix(c(4,3.7,3.7,9),2))   
+print(xy)
+# It will generate 2 sets of 1000 no. each with a mean of 50 for the 1st set & 60 for the 2nd set. The matrix option specifies the covariance matrix of the variables.
+
+# Q-6.8.1 (Execute var(xy) to check how close the variances are to our specified values – what is the covariance from these sample sets?)
+print(var(xy))
 
 # Q-7 (Uniform Distribution)
 

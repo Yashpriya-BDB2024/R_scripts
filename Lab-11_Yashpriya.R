@@ -1,3 +1,6 @@
+###### To be continued ------ ####### 
+###### DATE: 29.3.25 ######
+
 # Q-6 (Gaussian Distribution)
 
 # Q-6.1 (Compute and print the unit normal PDF value for μ = 12 and σ = 2)
@@ -79,7 +82,34 @@ print(xy)
 # It will generate 2 sets of 1000 no. each with a mean of 50 for the 1st set & 60 for the 2nd set. The matrix option specifies the covariance matrix of the variables.
 
 # Q-6.8.1 (Execute var(xy) to check how close the variances are to our specified values – what is the covariance from these sample sets?)
-print(var(xy))
+sample_var_cov_matrix <- var(xy)  # Since, we're drawing random samples, the variance values will be close to our specified values but not exact due to sampling variation.
+print(sample_var_cov_matrix)
+# Covariance: It tells us how two variables change together.
+# If two variables increase together, then covariance is positive, if one increases while other decreases, then its negative and if changes independently, then its zero.
+print(sample_var_cov_matrix[1,2])  # Specified covariance is 3.7 and what we get is close to 3.7 
+
+# Q-6.8.2 (Extract the separate vectors x and y as x <- xy[,1] and y <- xy[,2] and plot them to look at the correlation. Print the individual variances as var(x) and var(y).)
+x <- xy[,1]
+y <- xy[,2]
+plot(x, y, main = "Scatter plot of x and y (for correlation)", xlab="x", ylab="y")
+print(var(x))
+print(var(y))
+
+# Q-6.8.3 (Are the two samples independent? If so then the sum of their variances should be equal to the variance of their sum.).
+var_sum <- var(x+y)
+sum_var <- var(x)+var(y)
+print(var_sum)  
+print(sum_var)
+if (var_sum == sum_var) { print("x and y are independent.") } else { print("x and y are not independent.") }
+# Output: Since, we introduced covariance (3.7), so variables are not independent.
+
+# Q-6.8.4 (The reported covariance is var(xy). Compute the covariance using the correlation coefficient cor(x,y) and the individual variances and make sure this matches with the reported value.)
+cor_xy <- cor(x,y)   # correlation coefficient
+cov_xy <- cor_xy * sqrt(var(x)) * sqrt(var(y))   # covariance formula
+reported_cov_xy <- var(xy)[1,2]
+print(cov_xy)  
+print(reported_cov_xy)
+# Yes, the computed covariance exactly matches with the reported covariance value.
 
 # Q-7 (Uniform Distribution)
 

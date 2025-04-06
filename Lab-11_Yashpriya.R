@@ -231,3 +231,116 @@ x <- seq(0,10,length.out=500)  # Define x values
 z_sq <- ((x-mu)^2)/sigma^2
 plot(z_sq, dchisq(z_sq, df=1), type="l", col="blue", lwd=2, main="Chi-square PDF with df=1", xlab="Z^2", ylab="Density")
 # The density is high only near zero, and then it flattens out quickly.
+
+##### To be continued ------ #####
+##### DATE: 4.4.25 #####
+
+# Section-3 (Central Limit Theorem)
+
+# Section-3.1 (CLT case with sampling from non-normal distribution: )
+
+# Q.1 (Generate a sample set of 5 random deviates from a uniform distribution in the interval [0,10]. Repeat this 10,000 times. We now have 10,000 samples of 5 numbers each.)
+set.seed(42)  # to ensure reproducibility
+samples <- replicate(10000, runif(5, min=0, max=10))  # replicate(10000, ........) - will repeat this 10,000 times
+
+# Q.2 (Calculate the mean for each of the 10,000 samples and store it in a separate array. Plot this distribution of means as a histogram. 
+# Print the mean and standard deviation of the distribution of means.)
+sample_mean <- colMeans(samples)
+print(sample_mean)
+hist(sample_mean, breaks=30, main="Distribution of Means (Uniform [0,10])", xlab="Sample Mean", col="skyblue")
+mean_distri <- mean(sample_mean)
+print(mean_distri)
+sd_distri <- sd(sample_mean)
+print(sd_distri)
+
+# Q.3 (Generate a sequence of numbers between 0 and 10 with 0.1 spacing. Obtain the normal probability densities using dnorm function with the calculated mean and
+# standard deviation in the last question and store it as a separate vector.)
+x_vals <- seq(0,10,by=0.1)
+normal_pdf <- dnorm(x_vals, mean=mean_distri, sd=sd_distri)
+
+# Q.4 (Since we have 10,000 samples, we have to scale the normal probability density function to our particular case (since the area is 1.0 otherwise). The height and
+# bin width of a histogram are related to each other – if we doubled the bin width, there would be roughly twice as many numbers in the bin and the bar would be
+# twice as high on the y-axis. So to get the height of the bars on our frequency scale, we multiply the total frequency, i.e., 10,000 by the bin width 0.5 to get 5000. This
+# is the scaling factor for the PDF. Perform this and save the scaled probabilities as a separate array.)
+scaling_factor <- 10000 * 0.5  # total frequency: 10000, bin width: 0.5
+scaled_pdf <- normal_pdf * scaling_factor
+
+# Q.5 (Plot the normal curve on top of the histogram to see the level of agreement b/w the normal behaviour of the sample means and the normal curve.)
+hist(sample_mean, breaks=30, col="green", main="CLT: Uniform Distribution", xlab="Sample Mean")
+lines(x_vals, scaled_pdf, col="skyblue", lwd=2)   # Overlay normal curve on top of histogram
+legend("topright", legend=c("Normal behaviour of sample means", "Normal PDF"), col=c("green", "skyblue"), lwd=2)
+
+# Section-3.2 (CLT demo with sampling from non-normal, non-functional distribution: )
+
+# Q.1 (Create 10,000 samples of single dice throw using the sample() function. Make a plot of this distribution. You should see a uniform distribution.)
+a <- sample(1:6, size=10000, replace=TRUE)
+hist(a, main="Single Dice Throw - Uniform Distribution", xlab="Dice Face", ylab="Frequency", col="skyblue",
+     breaks=seq(0.5, 6.5, 1),  # Breaks between each dice face
+     xaxt="n")                 # Disable x-axis ticks
+axis(1, at=1:6)                # Add custom ticks at 1 to 6
+
+# Q.2 (Throw two dice and add the scores together (this is the ancient game of craps). Generate a new object b similar to the above. 
+# Plot a histogram of a+b. You should see a triangular shape developing for the histogram.)
+# Two independent dice throws
+a <- sample(1:6, size=10000, replace=TRUE)
+b <- sample(1:6, size=10000, replace=TRUE)
+sum_2_dice <- a+b  # Sum of the two dice throws
+# Plot the histogram (summing gives values 2 to 12)
+hist(sum_2_dice, main="Sum of Two Dice Throws - Triangular Distribution", xlab="Sum of Dice Faces", ylab="Frequency", col="orange", breaks=seq(1.5, 12.5, 1), xaxt="n")
+axis(1, at=2:12)
+
+# Q.3 (Repeat the exercise with three dice. The histogram should start showing the distinct bell shape.)
+a <- sample(1:6, size=10000, replace=TRUE)
+b <- sample(1:6, size=10000, replace=TRUE)
+c <- sample(1:6, size=10000, replace=TRUE)
+sum_3_dice <- a+b+c  # Sum of three dice throws
+hist(sum_3_dice, main="Sum of Three Dice Throws - Bell Shape", xlab="Sum of Dice Faces", ylab="Frequency",col="lightgreen",
+     breaks=seq(2.5, 18.5, 1),   # Range: 3 to 18, so breaks from 2.5 to 18.5
+     xaxt="n")
+axis(1, at=3:18)
+
+# Q.4 ( Repeat this with five dice. The histogram is now very close to a normal curve. Use the mean and standard deviation of the 5 dice to generate a normal PDF. 
+# As in the last problem, one has to scale the PDF to match the height of the normal curve with the height of the histogram.)
+a <- sample(1:6, size=10000, replace=TRUE)
+b <- sample(1:6, size=10000, replace=TRUE)
+c <- sample(1:6, size=10000, replace=TRUE)
+d <- sample(1:6, size=10000, replace=TRUE)
+e <- sample(1:6, size=10000, replace=TRUE)
+sum_5_dice <- a+b+c+d+e  # Sum of five dice throws
+h <- hist(sum_5_dice, main="Sum of Five Dice Throws - Very close to normal curve", xlab="Sum of Dice Faces", ylab="Frequency", col="lightcoral", breaks=seq(4.5, 30.5, 1), xaxt="n")
+axis(1, at=5:30)
+mean_val <- mean(sum_5_dice)
+sd_val <- sd(sum_5_dice)
+x <- seq(5, 30, length.out = 100)
+y <- dnorm(x, mean=mean_val, sd=sd_val)
+max_hist <- max(h$counts)   # Get max frequency from histogram
+max_y <- max(y)   # Get max height of the unscaled normal curve
+scaled_y <- y*(max_hist/max_y)   # Scale the normal y-values so that max(y) matches max(h$counts)
+lines(x, scaled_y, col="red", lwd=2)
+
+# Section-4 (ROC Curve)
+
+# Q-1 (Read in the white wine data into a dataframe, and create additional columns that classifies the data as good or bad wine based on threshold quality scores of 6, 7, 8, 9 and 10.)
+wine_data <- read.csv("\home\ibab\Downloads\winequality-white.csv", header=TRUE, sep=";") 
+print(str(wine_data))   # View structure of the data
+
+# Create good (label: 1) or bad (label: 0) wine binary classification columns based on different thresholds -
+# If the quality is greater than or equal to the threshold, then it will be labelled as 1, otherwise will be labelled as 0.
+wine_data$threshold_6 <- ifelse(wine_data$quality >= 6, 1, 0)
+wine_data$threshold_7 <- ifelse(wine_data$quality >= 7, 1, 0)
+wine_data$threshold_8 <- ifelse(wine_data$quality >= 8, 1, 0)
+wine_data$threshold_9 <- ifelse(wine_data$quality >= 9, 1, 0)
+wine_data$threshold_10 <- ifelse(wine_data$quality >= 10, 1, 0)
+print(head(wine_data, 20))   # To see the appended new columns of labels
+
+# Q-2 (Use plot.roc() function to plot the ROC curves for each threshold value. Which threshold value brings the ROC curve to the perfect classifier?)
+install.packages('pROC')
+library('pROC')
+plot.roc(wine_data$threshold_6, wine_data$alcohol, main="ROC Curve (threshold >= 6)", legacy.axes=TRUE, ci=TRUE, print.auc=TRUE, identity.lwd=2, print.thres=TRUE)   # AUC: 0.735
+plot.roc(wine_data$threshold_7, wine_data$alcohol, main="ROC Curve (threshold >= 7)", legacy.axes=TRUE, ci=TRUE, print.auc=TRUE, identity.lwd=2, print.thres=TRUE)   # AUC: 0.732
+plot.roc(wine_data$threshold_8, wine_data$alcohol, main="ROC Curve (threshold >= 8)", legacy.axes=TRUE, ci=TRUE, print.auc=TRUE, identity.lwd=2, print.thres=TRUE)   # AUC: 0.750
+plot.roc(wine_data$threshold_9, wine_data$alcohol, main="ROC Curve (threshold >= 9)", legacy.axes=TRUE, ci=TRUE, print.auc=TRUE, identity.lwd=2, print.thres=TRUE)   # AUC: 0.850
+plot.roc(wine_data$threshold_10, wine_data$alcohol, main="ROC Curve (threshold >= 10)", legacy.axes=TRUE, ci=TRUE, print.auc=TRUE, identity.lwd=2, print.thres=TRUE)  
+# Since, threshold >= 10 classifies the data into one class only (label: 0), so there will be no ROC / AUC. 
+# A perfect classifier has an AUC of 1.0, which means it perfectly distinguishes b/w the positive and negative classes without any error.
+# The threshold >= 9 gives the highest AUC (0.850) and therefore comes closest to being a "perfect classifier".
